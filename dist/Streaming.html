@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<title>Streaming</title>
+	<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script src="scripts/jquery-1.3.2.debug.js" type="text/javascript"></script>
+	<script src="scripts/json.debug.js" type="text/javascript"></script>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+
+	<script type="text/javascript">
+
+		// Initialisation variables
+		var arrayVids = new Array();
+		var arrayType = new Array();
+		var arrayTitle = new Array();
+		var arrayCreated = new Array();
+		var arrayCountry = new Array();
+		var arrayDevice = new Array();
+		var urlPath = "http://api.bambuser.com/broadcast.json";
+		var embedPath = "http://embed.bambuser.com/broadcast";
+		var apiKey = "c6dad7c861024861a44e634bb4d7a0ae";
+
+	</script>
+
+	<script type="text/javascript">
+
+		// Onload function
+		$(document).ready(function() {
+			  window.oncontextmenu = function() { return false; }
+
+			  $(function() {
+				//var button = $('#loginButton');
+				//var logoutbutton = $('#logoutButton');
+			});
+
+			loadData();
+		});
+
+	</script>
+
+	<script type="text/javascript">
+
+		// The main functions for loading the streams details, Include JSON call, Ajax Req
+		function loadData()
+		{
+			var urlTemp = "?api_key=" + apiKey + "&lat=" + "25.313076" + "&lon=" + "51.521774" + "&geo_distance=" + "100";
+
+			$.ajax({
+					type: "GET",
+					async: false,
+					accept: "application/json",
+					url: urlPath + urlTemp,
+					dataType: "jsonp",
+					success: function (resp, status, xhr) {
+					   $("#message").html("STATUS: " + xhr.status + " " + xhr.statusText + "\n" + resp);
+					   $("#message").show();
+					   $.each(resp, function() {
+							$.each(this, function(i, item) {
+								arrayVids[i]=item.vid;
+								arrayType[i]=item.type;
+								arrayTitle[i]=item.title;
+								arrayCreated[i]=item.created;
+								arrayCountry[i]=item.country;
+								arrayDevice[i]=item.device_name;
+							});
+
+			      		});
+
+			      		displayData();
+
+					},
+					error: function(resp, status, xhr){
+						$("#message").html("ERROR: " + xhr.status + " " + xhr.statusText + "\n" + resp.e);
+						$("#message").show();
+					}
+			});
+		}
+
+	</script>
+
+	<script type="text/javascript">
+
+		// The main function for displaying the streams details
+		function displayData()
+		{
+			 $("#SummaryTable").html("");
+			 var rowText = "";
+
+			 for (var i = 0; i < arrayVids.length; i++) {
+			 	var date = new Date(arrayCreated[i]*1000);
+				//var date2 = $.format.date(date, "dd/MM/yyyy");
+				rowText += "<table border='0' cellpadding='5' cellspacing='5'><thead><tr></tr></thead><tbody><tr>";
+				rowText += "<td valign='top' align='left'>";
+				rowText += "<iframe src='" + embedPath + "/" + arrayVids[i] +  "' width='320' height='276' frameborder='0'></iframe>";
+				rowText += "</td>";
+				rowText += "<td valign='top' align='left'>" + arrayTitle[i] + "&nbsp;&nbsp;(" + arrayType[i] + ")<br><br>" + arrayDevice[i] + "<br><br>" + arrayCountry[i] + "<br><br>" + date;
+				rowText += "</td></tr></tbody></table>";
+			 }
+
+			 $("#SummaryTable").html(rowText);
+		}
+
+	</script>
+
+</head>
+
+<body>
+	<div id="message" align="center"> </div>
+	<br><br>
+	<div id="AccountGrid" style="text-align:center;margin:0 auto;" align="center">
+
+		<div id="SummaryTable" style="display:inline-block;margin-left:5px;">
+
+		</div>
+
+	</div>
+
+</body>
+</html>
