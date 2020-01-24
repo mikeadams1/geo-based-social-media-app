@@ -83,11 +83,11 @@
 			}else{
 				// Initialization, using defualt values (radius:100, last 24hrs, current lat/long)
 				if(init == 0){
-					sRad = 1000;
+					sRad = 5000;
 					sType = "any";
 					document.mapForm.rad.value = sRad;
 					var today = new Date();
-					var yesterday = new Date(today.getTime() - (24 * 60 * 60 * 1000)); 
+					var yesterday = new Date(today.getTime() - (24 * 60 * 60 * 5000)); 
 					
 					iFromHour = yesterday.getHours();
 					iToHour = today.getHours();
