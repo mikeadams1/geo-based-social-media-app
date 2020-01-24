@@ -83,11 +83,11 @@
 			}else{
 				// Initialization, using defualt values (radius:100, last 24hrs, current lat/long)
 				if(init == 0){
-					sRad = 5000;
+					sRad = 1000;
 					sType = "any";
 					document.mapForm.rad.value = sRad;
 					var today = new Date();
-					var yesterday = new Date(today.getTime() - (24 * 60 * 60 * 5000)); 
+					var yesterday = new Date(today.getTime() - (24 * 60 * 60 * 1000)); 
 					
 					iFromHour = yesterday.getHours();
 					iToHour = today.getHours();
@@ -198,193 +198,12 @@
 		}
 	</script>
 	
-	<script type="text/javascript">
-		// The main function for loading the related Instagram data
-		var runIn;
-		function loadInstagram(sLat, sLon, sRad, dFrom, dTo){
-			runIn = 0;
-			arrayInstagrams = new Array();
-			dFrom = dFrom/1000;
-			dTo = dTo/1000;
-			var urlInstagram = "?lat=" + sLat + "&lng=" + sLon + "&distance=" + sRad + "&min_timestamp=" + dFrom + "&max_timestamp=" + dTo + "&access_token=" + instagramAccessToken + "&count=50"; 
-			$.ajax({
-					type: "GET",
-					async: false,
-					accept: "application/json",
-					url: instagramUrlPath + urlInstagram,
-					dataType: "jsonp",
-					success: function (resp, status, xhr) {
-					   $("#message").html("STATUS: " + xhr.status + " " + xhr.statusText + "\n" + resp);
-					   $("#message").hide();
-					   $.each(resp, function() {
-							$.each(this, function(i, item) {
-								if(i != "code"){
-									arrayInstagrams.push(item);
-								}
-							});
 
-			      	   });
-
-			      	   displayInstagrams();
-					},
-					error: function(resp, status, xhr){
-						$("#message").html("ERROR: " + xhr.status + " " + xhr.statusText + "\n" + resp.e);
-						$("#message").show();
-					}
-				});
-				
-				if(runIn==0){
-					displayInstagrams();
-				}
-		}
-	</script>
 	
 	<script type="text/javascript">
-		// The main function for loading the related Twitter data
-		var run;
-		function loadTwitter(sLat, sLon, sRad, sFrom, sTo){
-			run = 0;
-			arrayTweets = new Array();
-			var urlTwitter = "http://localhost:8080/streamingvideoservice/services/twitter/retrieveTweets?lat="+sLat+"&lon="+sLon+"&rad="+sRad+"&from="+sFrom+"&to="+sTo;
-			$.ajax({
-					type: "GET",
-					url: urlTwitter,
-					contentType: "application/json",
-					dataType: "json",
-					async: false,
-					//jsonpCallback: "jsoncallback",	
-					//jsonp: false,
-					//data: {},
-					success: function parse(resp, status, xhr) {
-					   $("#message").html("STATUS: " + xhr.status + " " + xhr.statusText + "\n" + resp);
-					   $("#message").hide();
-					   $.each(resp, function() {
-							$.each(this, function(i, tweet) {
-								arrayTweets.push(tweet);
-							});
-
-			      	   });
-						
-			      	   displayTweets();
-					},
-					error: function(resp, status, xhr){
-						$("#message").html("ERROR: " + resp.status + " " + resp.statusText + "\n" + xhr);
-						$("#message").show();
-					}
-					
-				});
-				
-				if(run==0){
-					displayTweets();
-				}
-		}
-	</script>
-
-	<script type="text/javascript">
-		// The main function for displaying the streams details
-		function displayData(sType, init, sRad)
-		{
-			 var itemText = "";
-			 
-			 if(arrayItems.length==0){
-			 	if(init==1){
-			 		alert("No " + sType.toUpperCase() + " videos found within " + sRad + "m radius from the selected location.");
-			 	}else{
-			 		alert("No " + sType.toUpperCase() + " videos found within " + sRad + "m radius from the selected location in the past 24 hrs.");
-			 	}
-			 }else{		 	
-			 	arrayItems.sort(compare);
-			 }
-			 
-			 for (var key in arrayItems) {
-			 	var obj = arrayItems[key];
-			 	var date = new Date(obj.created*1000);
-			 	//var sDate = parseDateToDDMMYYYYHHMMSS(date);
-				var image = "<img src='" + obj.preview + "' alt='" + obj.title + "' style='width:100%; height:auto;'/>";
-
-				itemText += "<table border='0' cellpadding='5' cellspacing='5'>";
-				itemText += "<thead></thead>";
-				itemText += "<tbody><tr><td style='vertical-align: bottom;' colspan='2'><font size='4'><strong>" + obj.title + "</strong></font></td></tr>";
-				itemText += "<tr><td style='width:240px; height:135px;'>" + image + "</td>";
-				//itemText += "<iframe src='" + embedPath + "/" + arrayVids[i] +  "' width='320' height='276' frameborder='0'></iframe>";
-				itemText += "<td valign='top' align='left'><b>Type</b>: " + obj.type + "<br><b>Device</b>: " + obj.device_name + "<br><b>Country</b>: " + obj.country + "<br><b>Latitude</b>: " + obj.lat + "<br><b>Longitude</b>: " + obj.lon + "<br><b>Date</b>: " + date + "</td></tr>";
-				itemText += "<tr><td colspan='2'><a target='_blank' href='" + obj.page + "'>Watch this video</a></td></tr>";
-				itemText += "</tbody></table>";
-				
-				arrayVideos.push(itemText);
-				itemText = "";
-			 }
-
-			 plotData();
-		}
 		
-		// The main function to display the videos on the left pannel
-		function displayVideos()
-		{
-			var itemText = "";
-			itemText += "<table width='320px' align='right'>";
-			itemText += "<thead><caption>Videos</caption></thead>";
-			itemText += "<tbody>";
-			
-			for (var key in arrayItems) {
-			 	var obj = arrayItems[key];
-				itemText += "<tr><td style='border-bottom: 1px dotted black;'>";
-				itemText += "<iframe src='" + embedPath + "/" + obj.vid +  "' width='320' height='276' frameborder='0'></iframe>";
-				itemText += "</td></tr>";
-			 }
-			 itemText += "</tbody></table>";
-			 document.getElementById('pannel1').innerHTML=itemText;
-			 
-		}
-		
-		// The main function to display the Instagrams on the right pannel
-		function displayInstagrams()
-		{
-			document.getElementById('pannel3').innerHTML="";
-			var itemText = "";
-			itemText += "<table width='320px;table-layout:fixed;'>";
-			itemText += "<thead><caption>Instagram</caption></thead>";
-			itemText += "<tbody>";
-			
-			for (var key in arrayInstagrams) {
-			 	var obj = arrayInstagrams[key];
-			 	var description = "";
-			 	if (obj.caption != null){
-			 		description = obj.caption.text;
-			 	}
-			 	itemText += "<tr><td width='25px'><img src='web/images/instagram.png' /></td><td align='left' width='185px'><b>" + obj.user.username + "</b></td></tr>";
-				itemText += "<tr><td colspan='2' width='310px'>" + description + "</td></tr>";
-				itemText += "<tr><td colspan='2' align ='left' width='310px' style='border-bottom: 1px dotted black;'>";
-				itemText += "<a href='" + obj.link + "' target='_blank'><img src='" + obj.images.thumbnail.url +  "' width='150px' height='150px'/></a>";
-				itemText += "</td></tr>";
-				//itemText += "<tr><td colspan='2'><hr width='300px'></td></tr>";
-			 }
-			 itemText += "</tbody></table>";
-			 document.getElementById('pannel3').innerHTML=itemText;
-			 runIn = 1;
-		}
-		
-		// The main function to display the Instagrams on the right pannel
-		function displayTweets()
-		{
-			document.getElementById('pannel2').innerHTML="";
-			var itemText = "";
-			itemText += "<table width='320px;table-layout:fixed;'>";
-			itemText += "<thead><caption>Twitter</caption></thead>";
-			itemText += "<tbody>";
-			
-			for (var key in arrayTweets) {
-			 	var obj = arrayTweets[key];
-			 	itemText += "<tr><td width='25px'><img src='web/images/twitter.jpg' /></td><td align='left' width='185px'><b>@" + obj.user + "</b></td></tr>";
-				itemText += "<tr><td colspan='2' width='310px'>" + obj.text + "</td></tr>";
-				itemText += "<tr><td colspan='2' align ='center' width='310px' style='border-bottom: 1px dotted black;'>";
-				itemText += "</td></tr>";
-				//itemText += "<tr><td colspan='2'><hr width='300px'></td></tr>";
-			 }
-			 itemText += "</tbody></table>";
-			 document.getElementById('pannel2').innerHTML=itemText;
-			 run = 1;
-		}
+
+
 	</script>
 
 	<!-- Google Maps -->
@@ -704,20 +523,7 @@
 	
 	<div id="container">
    	
-   		<fieldset style="margin-left: 370px;width: 800px;padding-bottom:0px;padding-right:0px;padding-left:00px;border: none;">
-			<img src="web/images/logo.png" />
-		</fieldset>
-		
-		<fieldset style="margin-left: 370px;width: 820px;padding:0px;border: none;">
-			<hr class="bar" /> 
-		</fieldset>
-		
-		<!-- Left pannel -->
-		<fieldset style="float:left;width: 340px;padding-top: 27px;border: none;"> 
-			<div id="pannel1" style="height:960px;overflow-y: scroll;border: 1px dotted black;">
-			
-			</div>
-		</fieldset>
+
 		
 		<!-- Middle pannel -->
 		<fieldset style="float:left;width: 800px;">
@@ -881,25 +687,7 @@
 			</table>
 		</div>
 		
-		</fieldset>
-				
-		<!-- Right top pannel -->
-		<fieldset style="float:left;width: 340px;height:480px;padding-top:27px;border: none;"> 
-			<div id="pannel2" style="width:335px;height:480px;overflow-y: scroll;overflow-x: hidden;border: 1px dotted black;">
-			
-			</div>
-		</fieldset>
-		
-		<!-- Right bottom pannel -->
-		<fieldset style="width:340px;height:461px;padding-left: 12px;border: none;"> 
-			<div id="pannel3" style="width: 335px;height:460px;overflow-y: scroll;overflow-x: hidden;border: 1px dotted black;">
-				
-			</div>
-		</fieldset>
-		
-		<fieldset style="margin-left: 370px;width: 820px;padding-bottom:0px;padding-top:10px;padding-right:0px;padding-left:0px;border: none;">
-			<hr class="bar"/> 
-		</fieldset>
+
 	</div>
 	
 	<div id="footer">
